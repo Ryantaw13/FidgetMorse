@@ -1,21 +1,50 @@
+#include <EEPROM.h>
+
 const int dotButtonPin = 26;
 const int dashButtonPin = 27;
 const int slashButtonPin = 28;
-const int recordButtonPin = 29;
+const int replayButtonPin = 29;
 const int dotLedPin = 6;
 const int dashLedPin = 7;
 const int slashLedPin = 0;
 const int replayLedPin = 1;
 
+const int EEPROM_SIZE = 128;
+
 String morseSequence = "";
 bool recording = false;
-bool replaying = false;
+
+void saveMorseSequence(const String &seq) {
+  int len = seq.length();
+  if (len > EEPROM_SIZE - 1) len = EEPROM_SIZE - 1;
+  for (int i = 0; i < len; i++) {
+    EEPROM.write(i, seq[i]);
+  }
+  EEPROM.write(len, 0);
+  EEPROM.commit();
+}
+
+String loadMorseSequence() {
+  char buffer[EEPROM_SIZE];
+  int i = 0;
+  while (i < EEPROM_SIZE - 1) {
+    buffer[i] = EEPROM.read(i);
+    if (buffer[i] == 0) break;
+    i++;
+  }
+  buffer[i] = '\0';
+  return String(buffer);
+}
 
 void setup() {
+  EEPROM.begin(EEPROM_SIZE);
+  morseSequence = loadMorseSequence();
+  Serial.begin(115200);
+
   pinMode(dotButtonPin, INPUT_PULLUP);
   pinMode(dashButtonPin, INPUT_PULLUP);
   pinMode(slashButtonPin, INPUT_PULLUP);
-  pinMode(recordButtonPin, INPUT_PULLUP);
+  pinMode(replayButtonPin, INPUT_PULLUP);
 
   pinMode(dotLedPin, OUTPUT);
   pinMode(dashLedPin, OUTPUT);
@@ -29,17 +58,22 @@ void setup() {
 }
 
 void loop() {
-  if (digitalRead(recordButtonPin) == LOW) {
-    delay(50); // debounce
-    if (!recording && !replaying) {
-      morseSequence = "";
-      recording = true;
-      while (digitalRead(recordButtonPin) == LOW) delay(10); // wait for release
-    } else if (recording) {
+  if (!recording && (
+      digitalRead(dotButtonPin) == LOW ||
+      digitalRead(dashButtonPin) == LOW ||
+      digitalRead(slashButtonPin) == LOW )) {
+    morseSequence = "";
+    recording = true;
+  }
+
+  if (digitalRead(replayButtonPin) == LOW) {
+    delay(50);
+    if (recording) {
+      saveMorseSequence(morseSequence);
       recording = false;
-      replaying = true;
-      while (digitalRead(recordButtonPin) == LOW) delay(10); // wait for release
     }
+    replayMorseCode();
+    while (digitalRead(replayButtonPin) == LOW) delay(10);
   }
 
   if (recording) {
@@ -56,15 +90,10 @@ void loop() {
       morseSequence += "/";
       while (digitalRead(slashButtonPin) == LOW) delay(10);
     } else {
-      lightOne(-1); // turn off all LEDs
+      lightOne(-1);
     }
   } else {
     lightOne(-1);
-  }
-
-  if (replaying) {
-    replayMorseCode();
-    replaying = false;
   }
 }
 
@@ -75,21 +104,23 @@ void lightOne(int ledPin) {
 }
 
 void replayMorseCode() {
+  Serial.print("Replay Morse: ");
+  Serial.println(morseSequence);
   for (unsigned int i = 0; i < morseSequence.length(); i++) {
     char c = morseSequence[i];
     if (c == '.') {
       digitalWrite(replayLedPin, HIGH);
-      delay(200); // dot duration
+      delay(200);
     } else if (c == '-') {
       digitalWrite(replayLedPin, HIGH);
-      delay(600); // dash duration
+      delay(600);
     } else if (c == '/') {
       digitalWrite(replayLedPin, LOW);
-      delay(1000); // word space
+      delay(1000);
       continue;
     }
     digitalWrite(replayLedPin, LOW);
-    delay(200); // symbol space
+    delay(200);
   }
   digitalWrite(replayLedPin, LOW);
 }
