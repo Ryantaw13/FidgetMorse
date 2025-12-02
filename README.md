@@ -18,3 +18,10 @@ Session 3
       - ~15 mins
       - Learnt more about button & LED logic
       - <img width="611" height="372" alt="image" src="https://github.com/user-attachments/assets/c324d266-9c9b-45af-a3c7-0fa1aecb84cb" />
+
+Session 4
+  - Edited Firmware at home for submission
+      - ~30 mins
+      - Learnt more about complexity of code and such
+      - <img width="611" height="600" alt="image" src="https://github.com/user-attachments/assets/d10e985d-0ff6-4156-ac89-dc7b93b93100" />
+
