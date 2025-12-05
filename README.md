@@ -26,7 +26,7 @@ Session 4
       - <img width="611" height="600" alt="image" src="https://github.com/user-attachments/assets/d10e985d-0ff6-4156-ac89-dc7b93b93100" />
 Session 5
   - Edited PCB, Schematic, Footprints, and 3d models
-      - ~3hrs (counted, believe me)
+      - ~3hrs (I counted, believe me)
       - Learnt all about the impossibility of footprint import
       - <img width="851" height="521" alt="image" src="https://github.com/user-attachments/assets/3f53a817-b6a5-4a30-9ded-3f81c58b8a68" />
       - <img width="898" height="581" alt="Screenshot 2025-12-04 215808" src="https://github.com/user-attachments/assets/ef8e557f-39b8-49a8-bda9-da194abd626b" />
